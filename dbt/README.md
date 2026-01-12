@@ -1,30 +1,52 @@
-# dbt Transformation Layer
+dbt Transformation Layer
+Overview
+This directory contains the Medallion Architecture implementation for the Energy Data Pipeline. We transform raw, source-specific data into high-performance analytical tables using DuckDB as the compute engine.
 
-Build dbt models to transform raw data into analytics-ready tables.
+Architecture: Medallion Pattern
+I chose the Medallion pattern to ensure data integrity and clear lineage:
 
-## Requirements
+Staging:
 
-- Initialize a dbt project: `dbt init` (docs: https://docs.getdbt.com/)
-- Organize models in a layered architecture (your choice of pattern)
-- Include data quality tests
-- Document your models
-- Configure profiles for PostgreSQL connection
+Models: stg_eia_energy, stg_synth_metrics
 
-## What We're Looking For
+Logic: Performs "Schema-on-Read." We cast raw strings (e.g., price) to numeric types and handle date normalization (converting YYYY-MM to YYYY-MM-01).
 
-- Thoughtful model organization
-- Appropriate use of incremental models where needed
-- Data quality tests on critical assertions
-- Documentation in schema.yml files
-- Your rationale for architecture choices (medallion, Kimball, other?)
+Intermediate:
 
-## Setup
+Models: int_energy_enriched
 
-Use `uv` for dependency management:
+Logic: This is an Incremental model that joins EIA commercial data with Synthetic environmental data on period and state_code.
 
-```bash
-uv pip install dbt-postgres
-dbt init
-```
+Why Incremental?: With 10 years of historical data for 50 states, rebuilding the entire table is inefficient. This model only processes new data records since the last run.
 
-Show us how you structure a transformation pipeline. The architecture choices are yours to make and justify.
+Final :
+
+Models: monthly_state_trends
+
+Logic: A "Wide Table" designed for BI tools. It joins dimensions (dim_states) with the enriched facts to provide a human-readable view including state names and regions.
+
+Data Quality & Testing
+Data integrity is enforced via dbt_utils and standard dbt tests:
+
+Unique/Not Null: Applied to state_code and period to ensure time-series integrity.
+
+Accepted Range: Ensures price_cents_kwh and carbon_intensity are non-negative.
+
+Relationship Tests: Validates that all state_code entries in fact tables exist in the dim_states dimension table.
+
+How to Run
+Install dependencies:
+
+Bash
+
+dbt deps
+Execute transformations:
+
+Bash
+
+dbt run
+Run quality assertions:
+
+Bash
+
+dbt test

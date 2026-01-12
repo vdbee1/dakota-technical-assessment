@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw_api
+    schema: analytics
+    tables:
+      - name: eia_energy
+        meta:
+          dagster:
+            asset_key: ["eia_energy"] 
+      - name: synth_metrics
+        meta:
+          dagster:
+            asset_key: ["synth_metrics"] 
+      - name: dim_states
+        meta:
+          dagster:
+            asset_key: ["dim_states"]

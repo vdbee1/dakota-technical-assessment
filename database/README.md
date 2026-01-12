@@ -1,20 +1,40 @@
-# Database
+# Database Design: 3-Table Normalized Star Schema
 
-Design and implement the database schema for the pipeline.
+## Rationale
+I chose a **3-table Normalized Star Schema** to provide strict isolation between data sources. This ensures that the EIA commercial data and the Synthetic environmental metrics can be ingested and updated independently without cross-contaminating the datasets.
 
-## Requirements
+## ER Diagram (Source-Separated)
+```mermaid
+erDiagram
+    dim_states ||--o{ fct_eia_energy : "links to"
+    dim_states ||--o{ fct_synth_metrics : "links to"
+    
+    dim_states {
+        string stateid PK "Primary Key (e.g., WY)"
+        string state_name "Full State Name"
+        string census_region "Geographic Region"
+        string market_type "Deregulated vs Regulated"
+    }
 
-- Use PostgreSQL or have clear rationale for why you chose something else
-- Design schema for raw data storage and transformed analytics
-- Include initialization scripts in `init/`
-- Document your schema design
+    fct_eia_energy {
+        string period PK "Year-Month (YYYY-MM)"
+        string stateid PK, FK "State Identifier"
+        double price "Residential Price (cents/kWh)"
+        double sales "Total Sales (MWh)"
+        string sectorid "Sector Code (RES)"
+        timestamp ingested_at "Audit: Ingestion Timestamp"
+    }
 
-## What We're Looking For
-
-- Thoughtful data modeling decisions
-- Appropriate use of schemas, indexes, and constraints
-- Consideration for time-series data characteristics
-- ER diagram or schema documentation in `documentation/`
-- Clear rationale for your design choices
-
-**Note:** Any examples or patterns mentioned elsewhere are suggestions only. Make your own informed decisions about schema design, naming, partitioning strategies, etc. We want to see **your** thinking.
+    fct_synth_metrics {
+        string period PK "Year-Month (YYYY-MM)"
+        string stateid PK, FK "State Identifier"
+        double peak_share "Peak Load Share"
+        double weather_index "Normalized Weather Severity"
+        double grid_stability_index "Grid Reliability Score"
+        double renewable_share "Renewable Energy Mix %"
+        double congestion_premium "Market Congestion Cost"
+        double fuel_cost_index "Fuel Price Sensitivity"
+        double volatility_score "Price Volatility Index"
+        double carbon_intensity "CO2 Intensity (lb/MWh)"
+        timestamp ingested_at "Audit: Ingestion Timestamp"
+    }
