@@ -2,7 +2,7 @@
 
 A production-ready end-to-end data pipeline for US energy analytics, built with modern data engineering tools and best practices.
 
-![Pipeline Architecture](documentation/db-er-diagram.png)
+![Pipeline Architecture](documentation/er-diagram.png)
 
 ## Overview
 
