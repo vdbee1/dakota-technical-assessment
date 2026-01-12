@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: monthly_state_trends
+    description: "Final analytical table for energy metrics across 50 states (10-year history)"
+    columns:
+      - name: state_code
+        description: "Two-letter state identifier"
+        tests:
+          - not_null
+      - name: price_cents_kwh
+        tests:
+          - dbt_utils.accepted_range:
+              # Nest arguments here to clear the warning
+              config:
+                where: "price_cents_kwh is not null"
+              min_value: 0
+              inclusive: true

@@ -1,0 +1,40 @@
+# Core Frameworks
+dagster
+dagster-webserver
+dagster-dbt
+dbt-core==1.7.4
+dbt-duckdb==1.7.2
+protobuf==4.25.3
+
+# Integration Libraries
+dagster-dbt
+dagstermill
+dagster-duckdb
+
+# Data & Database
+dbt-duckdb
+duckdb==1.4.3
+pandas
+pyarrow
+
+# API & Server
+fastapi
+uvicorn
+requests
+
+# Utilities
+python-dotenv
+matplotlib
+seaborn
+papermill
+
+# For notebook reports
+plotly
+scikit-learn
+nbformat
+ipykernel
+
+# Testing
+pytest
+pytest-cov
+pyyaml

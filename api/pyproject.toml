@@ -1,0 +1,13 @@
+[project]
+name = "energy-enrichment-api"
+version = "0.1.0"
+dependencies = [
+  "fastapi",
+    "uvicorn",
+    "strawberry-graphql[fastapi]",
+    "slowapi",
+    "python-dateutil"
+]
+
+[tool.uv]
+dev-dependencies = []

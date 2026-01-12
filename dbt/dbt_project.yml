@@ -1,0 +1,19 @@
+name: 'energy_transformations'
+version: '1.0.0'
+config-version: 2
+
+profile: 'energy_transformations'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+
+models:
+  energy_transformations:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: incremental
+    final:
+      +materialized: table

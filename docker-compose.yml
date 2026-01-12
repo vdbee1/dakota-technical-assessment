@@ -1,40 +1,39 @@
-version: '3.8'
-
-# This is a starter template. Modify and extend based on your implementation.
-# The code below is just for example, we expect you to modify it.
+version: "3.8"
 
 services:
-  # PostgreSQL Database or other database
-  postgres:
-    image: postgres:15-alpine
-    container_name: dakota_postgres
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-energy_analytics}
-      POSTGRES_USER: ${POSTGRES_USER:-dakota_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+  # Synthetic Energy Enrichment API
+  synthetic_api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init:/docker-entrypoint-initdb.d
-    networks:
-      - dakota_network
+      - "8000:8000"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dakota_user}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - energy-network
 
-  # Add your services here:
-  # - FastAPI service
-  # - Orchestrator
-  # - dbt
-  # - Jupyter (optional for notebooks)
-  # etc.
+  # Dagster Orchestration
+  dagster_app:
+    build:
+      context: .
+      dockerfile: orchestration/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - SYNTHETIC_API_URL=http://synthetic_api:8000
+      - EIA_API_KEY=${EIA_API_KEY}
+      - DAGSTER_HOME=/app/dagster_home
+    depends_on:
+      synthetic_api:
+        condition: service_healthy
+    networks:
+      - energy-network
 
 networks:
-  dakota_network:
+  energy-network:
     driver: bridge
-
-volumes:
-  postgres_data:

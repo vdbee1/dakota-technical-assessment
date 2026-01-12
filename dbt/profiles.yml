@@ -1,0 +1,10 @@
+energy_transformations:
+  outputs:
+    dev:
+      type: duckdb
+      path: '../database/energy_data.duckdb'
+      extensions:
+        - httpfs
+        - json
+      schema: main
+  target: dev
