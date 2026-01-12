@@ -290,15 +290,6 @@ docker compose logs -f synthetic_api
 ```
 
 ## API Documentation
-
-### REST Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Health check |
-| `/consumption/{state}` | GET | Get consumption data for state |
-| `/pricing/{state}` | GET | Get pricing data for state |
-
 ### GraphQL Queries
 
 ```graphql
